@@ -11,7 +11,7 @@ module.exports = function (connection, str, args) {
     fields = fs.map(function (f) { return f.name; });
     stream.emit('data', {
       fields: fields.map(function (f) {
-        return f.replace(/([a-z])([A-Z])/g, function (_, a, b) { return a + ' ' + b.toLowerCase(); }).replace(/_/g, ' ');
+        return f.replace(/([a-z])([A-Z])/g, '$1 $2').replace(/_/g, ' ');
       })
     });
   });
