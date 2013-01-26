@@ -2,6 +2,8 @@ var Stream = require('stream');
 exports.chain = chain;
 function chain(write, read) {
   var stream = new Stream();
+  stream.writable = true;
+  stream.readable = true;
   var oldOn = stream.on.bind(stream);
   stream.on = function (name, fn) {
     oldOn(name, fn);

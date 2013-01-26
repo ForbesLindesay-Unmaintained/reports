@@ -1,6 +1,6 @@
 var Stream = require('stream');
 
-module.exports = (connection, str, args) {
+module.exports = function (connection, str, args) {
   var query = connection.query(str);
   var stream = new Stream();
 
