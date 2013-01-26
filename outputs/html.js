@@ -28,7 +28,7 @@ module.exports = function () {
       next('<tr>');
       for (var i = 0; i < record.length; i++) {
         next('<td>');
-        next(escape(record[i]));
+        next(escape(record[i] === null ? '' : record[i]));
         next('</td>');
       }
       finish(null, '</tr>');
