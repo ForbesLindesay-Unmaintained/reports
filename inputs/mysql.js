@@ -16,7 +16,7 @@ module.exports = function (connection, str, args) {
           return f.replace(/([a-z])([A-Z])/g, '$1 $2').replace(/_/g, ' ');
         });
         if (!stream.push({fields: fieldNames}) && !paused) {
-          query.pause();
+          connection.pause();
           paused = true;
         }
       });
@@ -24,14 +24,14 @@ module.exports = function (connection, str, args) {
         if (record.constructor.name === 'RowDataPacket') {
           record = fields.map(function (f) { return record[f]; });
           if (!stream.push(record) && !paused) {
-            query.pause();
+            connection.pause();
           }
         } else {
           stream.emit('packet', record);
         }
       });
     } else if (paused) {
-      query.resume();
+      connection.resume();
     }
   };
 
