@@ -1,6 +1,6 @@
 {
   "name": "reports",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "A system to help build a reporting interface for your node.js website",
   "main": "index.js",
   "dependencies": {
