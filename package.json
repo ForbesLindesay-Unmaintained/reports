@@ -4,9 +4,9 @@
   "description": "A system to help build a reporting interface for your node.js website",
   "main": "index.js",
   "dependencies": {
-    "escape-html": "~0",
-    "transform-stream": "~0",
-    "csv": "~0"
+    "escape-html": "~1.0.0",
+    "csv": "~0.3.6",
+    "barrage": "~1.0.0"
   },
   "devDependencies": {},
   "scripts": {

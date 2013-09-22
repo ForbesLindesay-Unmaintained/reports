@@ -1,41 +1,43 @@
-var transform = require('transform-stream');
 var escape = require('escape-html');
 var utils = require('../utils');
 var withContentType = utils.withContentType;
+var transform = utils.transform;
 
 module.exports = function () {
   var first = true;'text/html'
   return withContentType(transform(transformRecord, transformEnd), 'text/html');
-  function transformRecord(record, next, finish) {
+  function transformRecord(record, encoding, callback) {
     if (first) {
       first = false;
     } else if (record.fields) {
-      next('</tbody></table>');
+      this.push('</tbody></table>');
     }
     if (record.fields) {
-      next('<table>');
-      next('<thead>');
-      next('<tr>');
+      this.push('<table>');
+      this.push('<thead>');
+      this.push('<tr>');
       for (var i = 0; i < record.fields.length; i++) {
-        next('<th>');
-        next(escape(record.fields[i]));
-        next('</th>');
+        this.push('<th>');
+        this.push(escape(record.fields[i]));
+        this.push('</th>');
       }
-      next('</tr>');
-      next('</thead>');
-      finish(null, '<tbody>');
+      this.push('</tr>');
+      this.push('</thead>');
+      this.push('<tbody>');
     } else {
-      next('<tr>');
+      this.push('<tr>');
       for (var i = 0; i < record.length; i++) {
-        next('<td>');
-        next(escape(record[i] === null ? '' : record[i]));
-        next('</td>');
+        this.push('<td>');
+        this.push(escape(record[i] === null ? '' : record[i]));
+        this.push('</td>');
       }
-      finish(null, '</tr>');
+      this.push('</tr>');
     }
+    callback();
   }
 
-  function transformEnd(finish) {
-    finish(null, '</tbody></table>')
+  function transformEnd(callback) {
+    this.push('</tbody></table>');
+    callback();
   }
 };

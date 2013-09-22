@@ -1,23 +1,23 @@
-var transform = require('transform-stream');
 var utils = require('../utils');
 var withContentType = utils.withContentType;
+var transform = utils.transform;
 
 module.exports = function () {
   var first = true;
   return withContentType(transform(transformRecord, transformEnd), 'application/json');
-  function transformRecord(record, next, finish) {
-    console.log(record);
+  function transformRecord(record, encoding, callback) {
     if (first) {
       first = false;
-      next('[');
+      this.push('[');
     } else {
-      next(',');
+      this.push(',');
     }
-    finish(null, JSON.stringify(record));
+    this.push(JSON.stringify(record));
+    callback();
   }
 
   function transformEnd(finish) {
-    console.log('end');
-    finish(null, ']')
+    this.push(']');
+    callback();
   }
 };

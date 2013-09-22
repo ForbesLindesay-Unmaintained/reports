@@ -1,33 +1,39 @@
-var Stream = require('stream');
+var Readable = require('barrage').Readable;
 
 module.exports = function (connection, str, args) {
-  var query = connection.query(str, args);
-  var stream = new Stream();
+  var query, fields;
+  var paused = true;
+  var stream = new Readable({objectMode: true});
 
-  var fields;
-  query.on('error', function (err) { stream.emit('error', err); });
-  query.on('end', function () { stream.emit('end'); });
-  query.on('fields', function (fs) {
-    fields = fs.map(function (f) { return f.name; });
-    stream.emit('data', {
-      fields: fields.map(function (f) {
-        return f.replace(/([a-z])([A-Z])/g, '$1 $2').replace(/_/g, ' ');
-      })
-    });
-  });
-  query.on('result', function (record) {
-    if (record.constructor.name === 'RowDataPacket')
-      stream.emit('data', fields.map(function (f) { return record[f]; }));
-    else
-      stream.emit('packet', record);
-  });
-
-  query.on('end', function () {
-    stream.emit('end');
-  });
-
-  stream.pause = connection.pause.bind(query);
-  stream.resume = connection.resume.bind(query);
+  stream._read = function () {
+    if (!query) {
+      query = connection.query(str, args);
+      query.on('error', function (err) { stream.emit('error', err); });
+      query.on('end', function () { stream.push(null); });
+      query.on('fields', function (fs) {
+        fields = fs.map(function (f) { return f.name; });
+        var fieldNames = fields.map(function (f) {
+          return f.replace(/([a-z])([A-Z])/g, '$1 $2').replace(/_/g, ' ');
+        });
+        if (!stream.push({fields: fieldNames}) && !paused) {
+          query.pause();
+          paused = true;
+        }
+      });
+      query.on('result', function (record) {
+        if (record.constructor.name === 'RowDataPacket') {
+          record = fields.map(function (f) { return record[f]; });
+          if (!stream.push(record) && !paused) {
+            query.pause();
+          }
+        } else {
+          stream.emit('packet', record);
+        }
+      });
+    } else if (paused) {
+      query.resume();
+    }
+  };
 
   return stream;
 };

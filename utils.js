@@ -67,3 +67,11 @@ function withContentType(stream, contentType) {
   };
   return stream;
 }
+
+exports.transform = transform;
+function transform(transform, flush) {
+  var stream = new Stream.Transform({objectMode: true});
+  stream._transform = transform;
+  stream._flush = flush;
+  return stream;
+}
