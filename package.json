@@ -5,8 +5,8 @@
   "main": "index.js",
   "dependencies": {
     "escape-html": "~1.0.0",
-    "csv": "~0.3.6",
-    "barrage": "~1.0.0"
+    "csv": "~1.1.1",
+    "barrage": "~1.1.0"
   },
   "devDependencies": {},
   "scripts": {
